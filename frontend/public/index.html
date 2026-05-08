@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ERP Farmacias SIMI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --surface: #161616;
+      --surface2: #1e1e1e;
+      --border: #2a2a2a;
+      --accent: #b5ff2e;
+      --accent2: #7c3aed;
+      --text: #f0f0f0;
+      --muted: #888;
+      --danger: #ff4d4d;
+    }
+ 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+ 
+    /* ── HEADER ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+ 
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+ 
+    .logo-dot {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+ 
+    .logo-dot svg {
+      width: 16px;
+      height: 16px;
+    }
+ 
+    .logo h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+ 
+    .logo h1 span {
+      color: var(--accent);
+    }
+ 
+    .header-meta {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+ 
+    .header-meta::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+ 
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+ 
+    /* ── LAYOUT ── */
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+ 
+    /* ── SECTION TITLE ── */
+    .section-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+ 
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+ 
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+ 
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+ 
+    /* ── FORM ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+ 
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+ 
+    label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+ 
+    input, select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+ 
+    input::placeholder { color: #444; }
+ 
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(181,255,46,0.08);
+    }
+ 
+    select option { background: var(--surface2); }
+ 
+    /* ── BUTTONS ── */
+    .btn {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 11px 28px;
+      margin-top: 1.25rem;
+      transition: all 0.18s;
+    }
+ 
+    .btn-primary {
+      background: var(--accent);
+      color: #0d0d0d;
+    }
+ 
+    .btn-primary:hover {
+      background: #c8ff50;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(181,255,46,0.25);
+    }
+ 
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid rgba(255,77,77,0.3);
+      font-size: 11px;
+      padding: 5px 12px;
+      margin-top: 0;
+      border-radius: 6px;
+    }
+ 
+    .btn-danger:hover {
+      background: rgba(255,77,77,0.1);
+      border-color: var(--danger);
+    }
+ 
+    /* ── MESSAGES ── */
+    #msg {
+      margin-top: 1rem;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      display: none;
+      font-weight: 500;
+    }
+ 
+    .msg-ok {
+      background: rgba(181,255,46,0.1);
+      color: var(--accent);
+      border: 1px solid rgba(181,255,46,0.2);
+    }
+ 
+    .msg-err {
+      background: rgba(255,77,77,0.1);
+      color: var(--danger);
+      border: 1px solid rgba(255,77,77,0.2);
+    }
+ 
+    /* ── TABLE ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+ 
+    thead tr {
+      border-bottom: 1px solid var(--border);
+    }
+ 
+    th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 10px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+ 
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+ 
+    tbody tr:hover {
+      background: var(--surface2);
+    }
+ 
+    tbody tr:last-child { border-bottom: none; }
+ 
+    td {
+      padding: 12px 14px;
+      color: var(--text);
+    }
+ 
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 9px;
+      border-radius: 20px;
+      background: rgba(124,58,237,0.15);
+      color: #a78bfa;
+      border: 1px solid rgba(124,58,237,0.25);
+    }
+ 
+    .price-cell {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      color: var(--accent);
+    }
+ 
+    .stock-cell {
+      font-weight: 500;
+    }
+ 
+    .desc-cell {
+      color: var(--muted);
+      font-size: 13px;
+    }
+ 
+    #loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+ 
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+ 
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+ 
+    /* ── STATS BAR ── */
+    .stats-bar {
+      display: flex;
+      gap: 1px;
+      margin-bottom: 1.5rem;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+ 
+    .stat {
+      flex: 1;
+      background: var(--surface);
+      padding: 1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+ 
+    .stat-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+ 
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+    }
+ 
+    .stat:first-child .stat-val { color: var(--accent); }
+    .stat:last-child .stat-val  { color: #a78bfa; }
+  </style>
+</head>
+<body>
+ 
+<header>
+  <div class="logo">
+    <div class="logo-dot">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 2v12M2 8h12" stroke="#0d0d0d" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h1>Farmacias <span>SIMI</span></h1>
+  </div>
+  <div class="header-meta">Sistema activo · ERP Inventario</div>
+</header>
+ 
+<div class="container">
+ 
+  <!-- Stats bar -->
+  <div class="stats-bar" id="statsBar">
+    <div class="stat">
+      <div class="stat-val" id="statTotal">—</div>
+      <div class="stat-label">Productos registrados</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="statStock">—</div>
+      <div class="stat-label">Unidades en stock</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="statCats">—</div>
+      <div class="stat-label">Categorías activas</div>
+    </div>
+  </div>
+ 
+  <!-- Formulario -->
+  <div class="section-label">Registrar producto</div>
+  <div class="card">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Nombre *</label>
+        <input type="text" id="nombre" placeholder="Ej: Paracetamol 500mg" />
+      </div>
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="categoria">
+          <option value="">Seleccionar...</option>
+          <option>Analgesicos</option>
+          <option>Antibioticos</option>
+          <option>Antiinflamatorios</option>
+          <option>Vitaminas</option>
+          <option>Cuidado personal</option>
+          <option>Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Precio (CLP) *</label>
+        <input type="number" id="precio" placeholder="0" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Stock *</label>
+        <input type="number" id="stock" placeholder="0" min="0" />
+      </div>
+      <div class="form-group" style="grid-column: 1 / -1;">
+        <label>Descripcion</label>
+        <input type="text" id="descripcion" placeholder="Descripcion breve del producto" />
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="agregarProducto()">Guardar producto</button>
+    <div id="msg"></div>
+  </div>
+ 
+  <!-- Tabla -->
+  <div class="section-label">Listado de productos</div>
+  <div class="card">
+    <div id="loading">
+      <div class="spinner"></div>
+      Cargando productos...
+    </div>
+    <table id="tabla" style="display:none;">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Categoria</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Descripcion</th>
+          <th>Accion</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+ 
+</div>
+ 
+<script>
+  const API = '/api/productos';
+ 
+  async function cargarProductos() {
+    try {
+      const res = await fetch(API);
+      const productos = await res.json();
+      const tbody = document.getElementById('tbody');
+      tbody.innerHTML = '';
+ 
+      // Actualizar stats
+      const totalStock = productos.reduce((s, p) => s + Number(p.stock), 0);
+      const cats = new Set(productos.map(p => p.categoria).filter(Boolean)).size;
+      document.getElementById('statTotal').textContent = productos.length;
+      document.getElementById('statStock').textContent = totalStock.toLocaleString('es-CL');
+      document.getElementById('statCats').textContent = cats;
+ 
+      if (productos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#444;padding:3rem;font-size:13px;">No hay productos registrados.</td></tr>';
+      } else {
+        productos.forEach(p => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="color:var(--muted);font-size:12px;">#${p.id}</td>
+            <td><strong>${p.nombre}</strong></td>
+            <td>${p.categoria ? `<span class="badge">${p.categoria}</span>` : '<span style="color:#444">—</span>'}</td>
+            <td class="price-cell">$${Number(p.precio).toLocaleString('es-CL')}</td>
+            <td class="stock-cell">${p.stock}</td>
+            <td class="desc-cell">${p.descripcion || '—'}</td>
+            <td><button class="btn btn-danger" onclick="eliminar(${p.id})">Eliminar</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+ 
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('tabla').style.display = 'table';
+ 
+    } catch (e) {
+      document.getElementById('loading').innerHTML = '<span style="color:var(--danger)">Error al conectar con el servidor.</span>';
+    }
+  }
+ 
+  async function agregarProducto() {
+    const nombre      = document.getElementById('nombre').value.trim();
+    const precio      = document.getElementById('precio').value;
+    const stock       = document.getElementById('stock').value;
+    const descripcion = document.getElementById('descripcion').value.trim();
+    const categoria   = document.getElementById('categoria').value;
+    const msg         = document.getElementById('msg');
+ 
+    if (!nombre || !precio || !stock) {
+      msg.textContent = 'Completa los campos obligatorios (*)';
+      msg.className = 'msg-err';
+      msg.style.display = 'block';
+      return;
+    }
+ 
+    try {
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre,
+          descripcion,
+          precio: parseFloat(precio),
+          stock: parseInt(stock),
+          categoria
+        })
+      });
+ 
+      if (res.ok) {
+        msg.textContent = 'Producto guardado correctamente.';
+        msg.className = 'msg-ok';
+        msg.style.display = 'block';
+        ['nombre','precio','stock','descripcion'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('categoria').value = '';
+        cargarProductos();
+        setTimeout(() => msg.style.display = 'none', 3000);
+      } else {
+        msg.textContent = 'Error al guardar el producto.';
+        msg.className = 'msg-err';
+        msg.style.display = 'block';
+      }
+    } catch (e) {
+      msg.textContent = 'No se pudo conectar con la API.';
+      msg.className = 'msg-err';
+      msg.style.display = 'block';
+    }
+  }
+ 
+  async function eliminar(id) {
+    if (!confirm('¿Eliminar este producto?')) return;
+    await fetch(`${API}/${id}`, { method: 'DELETE' });
+    cargarProductos();
+  }
+ 
+  cargarProductos();
+</script>
+ 
+</body>
+</html>
+ 

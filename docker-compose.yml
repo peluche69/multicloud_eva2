@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+
+  db:
+    build: ./database
+    container_name: simi-db
+    restart: always
+    environment:
+      POSTGRES_DB: simi_erp
+      POSTGRES_USER: simi_user
+      POSTGRES_PASSWORD: simi_pass123
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - simi-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U simi_user -d simi_erb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build: ./frontend
+    container_name: simi-frontend
+    restart: always
+    ports:
+      - "80:80"
+    environment:
+      DB_HOST: db
+      DB_NAME: simi_erp
+      DB_USER: simi_user
+      DB_PASS: simi_pass123
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - simi-net
+
+networks:
+  simi-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  pgdata:
