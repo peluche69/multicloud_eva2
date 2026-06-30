@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Login — Farmacias SIMI</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .card { background: white; padding: 2rem; border-radius: 12px; width: 360px; border: 1px solid #ddd; }
+    h2 { color: #1a5276; text-align: center; margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    label { font-size: 13px; color: #555; display: block; margin-bottom: 4px; }
+    input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+    .btn { width: 100%; background: #1a5276; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-size: 15px; margin-top: 1rem; }
+    .btn:hover { background: #154360; }
+    .error { color: #c0392b; font-size: 13px; text-align: center; margin-top: 0.5rem; display: none; }
+    .logo { text-align: center; margin-bottom: 1rem; font-size: 2rem; }
+    .step { display: none; }
+    .step.active { display: block; }
+    #qr-container { text-align: center; margin: 1rem 0; }
+    #qr-container img { width: 180px; border: 1px solid #ddd; border-radius: 8px; }
+    .info { background: #eaf4fb; border-left: 4px solid #1a5276; padding: 10px; font-size: 12px; color: #555; border-radius: 4px; margin-bottom: 1rem; }
+    .badge { background: #1a5276; color: white; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 6px; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">💊</div>
+  <h2>Farmacias SIMI</h2>
+  <p style="text-align:center;font-size:12px;color:#888;margin-bottom:1.5rem;">Sistema ERP — Acceso seguro MFA</p>
+
+  <!-- PASO 1: Usuario y contraseña -->
+  <div class="step active" id="step1">
+    <div class="info"><span class="badge">1</span>Ingresa tus credenciales</div>
+    <div class="form-group">
+      <label>Usuario</label>
+      <input type="text" id="username" placeholder="Ingresa tu usuario"/>
+    </div>
+    <div class="form-group">
+      <label>Contraseña</label>
+      <input type="password" id="password" placeholder="Ingresa tu contraseña"/>
+    </div>
+    <button class="btn" onclick="login()">Continuar</button>
+    <div class="error" id="error1">Usuario o contraseña incorrectos</div>
+  </div>
+
+  <!-- PASO 2: Escanear QR (solo primera vez) -->
+  <div class="step" id="step2">
+    <div class="info"><span class="badge">2</span>Escanea el QR con Google Authenticator</div>
+    <div id="qr-container">
+      <img id="qr-img" src="" alt="QR Code"/>
+    </div>
+    <p style="font-size:12px;color:#888;text-align:center;margin-bottom:1rem;">
+      Abre Google Authenticator → Agregar cuenta → Escanear QR
+    </p>
+    <button class="btn" onclick="mostrarTotp()">Ya escaneé el QR</button>
+  </div>
+
+  <!-- PASO 3: Código TOTP -->
+  <div class="step" id="step3">
+    <div class="info"><span class="badge">3</span>Ingresa el código de Google Authenticator</div>
+    <div class="form-group">
+      <label>Código de 6 dígitos</label>
+      <input type="text" id="totp" placeholder="000000" maxlength="6" style="text-align:center;font-size:1.5rem;letter-spacing:8px;"/>
+    </div>
+    <button class="btn" onclick="verificarTotp()">Verificar y entrar</button>
+    <div class="error" id="error3">Código incorrecto o expirado</div>
+  </div>
+</div>
+
+<script>
+  let currentUser = '';
+
+  if (localStorage.getItem('token')) {
+    window.location.href = '/index.html';
+  }
+
+  function mostrarStep(step) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById(step).classList.add('active');
+  }
+
+  function mostrarTotp() {
+    mostrarStep('step3');
+  }
+
+  async function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    document.getElementById('error1').style.display = 'none';
+
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      if (!res.ok) {
+        document.getElementById('error1').style.display = 'block';
+        return;
+      }
+
+      const data = await res.json();
+      currentUser = username;
+
+      if (data.step === 'setup_totp') {
+        const r = await fetch('/api/totp/setup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username })
+        });
+        const qrData = await r.json();
+        document.getElementById('qr-img').src = qrData.qr;
+        mostrarStep('step2');
+      } else if (data.step === 'verify_totp') {
+        mostrarStep('step3');
+      }
+    } catch {
+      document.getElementById('error1').style.display = 'block';
+    }
+  }
+
+  async function verificarTotp() {
+    const totpCode = document.getElementById('totp').value;
+    document.getElementById('error3').style.display = 'none';
+
+    try {
+      const res = await fetch('/api/totp/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: currentUser, token: totpCode })
+      });
+
+      if (!res.ok) {
+        document.getElementById('error3').style.display = 'block';
+        return;
+      }
+
+      const data = await res.json();
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('username', data.username);
+      window.location.href = '/index.html';
+    } catch {
+      document.getElementById('error3').style.display = 'block';
+    }
+  }
+
+  document.addEventListener('keypress', e => {
+    if (e.key === 'Enter') {
+      const step1 = document.getElementById('step1');
+      const step3 = document.getElementById('step3');
+      if (step1.classList.contains('active')) login();
+      if (step3.classList.contains('active')) verificarTotp();
+    }
+  });
+</script>
+</body>
+</html>
